@@ -1,35 +1,45 @@
 import { nanoid } from "nanoid";
-import { readDB, withWriteLock, writeDB } from "./db";
+import { getSupabase } from "./supabase/server";
+import { bloqueioToInsert, rowToBloqueio, type BloqueioRow } from "./supabase/mappers";
 import type { Bloqueio } from "./types";
 
 export async function getBloqueios(): Promise<Bloqueio[]> {
-  const db = await readDB();
-  return db.bloqueios;
+  const supabase = getSupabase();
+  const { data, error } = await supabase
+    .from("bloqueios")
+    .select("*")
+    .order("data", { ascending: true });
+
+  if (error) throw error;
+  return ((data ?? []) as BloqueioRow[]).map(rowToBloqueio);
 }
 
 export async function createBloqueio(
   data: Omit<Bloqueio, "id" | "criadoEm">
 ): Promise<Bloqueio> {
-  return withWriteLock(async () => {
-    const db = await readDB();
-    const bloqueio: Bloqueio = {
-      id: nanoid(10),
-      ...data,
-      criadoEm: new Date().toISOString(),
-    };
-    db.bloqueios.push(bloqueio);
-    await writeDB(db);
-    return bloqueio;
-  });
+  const supabase = getSupabase();
+  const bloqueio: Bloqueio = {
+    id: nanoid(10),
+    ...data,
+    criadoEm: new Date().toISOString(),
+  };
+
+  const { error } = await supabase
+    .from("bloqueios")
+    .insert(bloqueioToInsert(bloqueio));
+
+  if (error) throw error;
+  return bloqueio;
 }
 
 export async function deleteBloqueio(id: string): Promise<boolean> {
-  return withWriteLock(async () => {
-    const db = await readDB();
-    const filtered = db.bloqueios.filter((b) => b.id !== id);
-    if (filtered.length === db.bloqueios.length) return false;
-    db.bloqueios = filtered;
-    await writeDB(db);
-    return true;
-  });
+  const supabase = getSupabase();
+  const { data, error } = await supabase
+    .from("bloqueios")
+    .delete()
+    .eq("id", id)
+    .select("id");
+
+  if (error) throw error;
+  return (data?.length ?? 0) > 0;
 }

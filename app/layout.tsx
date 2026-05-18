@@ -20,10 +20,6 @@ const brandName = process.env.NEXT_PUBLIC_BRAND_NAME ?? "ReuniCheck";
 export const metadata: Metadata = {
   title: `${brandName} — Agendamento`,
   description: "Sistema de agendamento de reuniões",
-  icons: {
-    icon: [{ url: "/logo.png", type: "image/png" }],
-    apple: "/logo.png",
-  },
 };
 
 export const viewport = {

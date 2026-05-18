@@ -6,6 +6,7 @@ Sistema de agendamento de reuniões para agências de software. O admin cria lin
 
 - Node.js 18+
 - npm
+- Projeto [Supabase](https://supabase.com) com Postgres
 
 ## Variáveis de ambiente
 
@@ -13,23 +14,32 @@ Copie `.env.local.example` para `.env.local`:
 
 | Variável | Descrição |
 |----------|-----------|
+| `SUPABASE_URL` | URL do projeto Supabase (Settings → API) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Service role key (somente servidor; nunca expor no cliente) |
 | `NEXT_PUBLIC_BASE_URL` | URL pública do app (links copiáveis) |
 | `NEXT_PUBLIC_BRAND_NAME` | Nome exibido na UI |
-| `NEXT_PUBLIC_AGENCY_URL` | URL do botão "voltar" após agendamento |
+| `NEXT_PUBLIC_AGENCY_URL` | URL do site da agência (referência) |
+
+## Banco de dados
+
+As tabelas `links`, `agendamentos` e `bloqueios` ficam no Postgres do Supabase. A migration inicial (`create_reunicheck_schema`) cria:
+
+- `links` — configuração do link e `slots` (jsonb)
+- `agendamentos` — reservas dos clientes (`UNIQUE` em link + data + horário)
+- `bloqueios` — horários bloqueados pelo admin
 
 ## Executar localmente
 
 ```bash
 npm install
 cp .env.local.example .env.local
+# Preencha SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY
 npm run dev
 ```
 
 - Agenda admin: [http://localhost:3000/admin](http://localhost:3000/admin)
 - Gerenciar links: [http://localhost:3000/admin/links](http://localhost:3000/admin/links)
 - Agendamento público: `http://localhost:3000/agendar/[linkId]`
-
-Os dados são salvos em `data/db.json` (criado automaticamente se não existir; migra de `data/links.json` se existir).
 
 ## Sistema de Bloqueios
 
@@ -49,27 +59,19 @@ app/
   agendar/[linkId]/   # Fluxo do cliente
   api/                # Route Handlers (links, bloqueios, agendar)
 components/           # UI (AgendaCalendar, SlotBuilder, SlotPicker, …)
-data/db.json          # Persistência local (dev)
-lib/                  # db, links, bloqueios, dates, schemas, slots
+lib/
+  supabase/           # Cliente Postgres (server-only)
+  links.ts            # CRUD de links e agendamentos
+  bloqueios.ts        # CRUD de bloqueios
 ```
 
 ## Deploy na Vercel
 
 1. Conecte o repositório na Vercel.
-2. Configure as variáveis de ambiente `NEXT_PUBLIC_*`.
+2. Configure `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` e as variáveis `NEXT_PUBLIC_*`.
 3. Defina `NEXT_PUBLIC_BASE_URL` para a URL de produção (ex: `https://seu-app.vercel.app`).
 
-### Persistência em produção
-
-O filesystem da Vercel é **somente leitura** (exceto `/tmp`, que não persiste entre deploys). O arquivo `data/db.json` **funciona apenas em desenvolvimento local**.
-
-Para produção, migre a camada `lib/db.ts` para:
-
-- Vercel KV / Upstash Redis
-- Vercel Blob
-- Supabase / Postgres
-
-O restante da aplicação (APIs, UI) permanece igual.
+A persistência usa **apenas Postgres (Supabase)** — não há arquivo local nem cache de dados em produção.
 
 ## Identidade visual
 
