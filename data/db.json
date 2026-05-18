@@ -1,0 +1,59 @@
+{
+  "links": [
+    {
+      "id": "475j_Pq8bZ",
+      "titulo": "Reunião de apresentação ",
+      "descricao": "Essa é A reunião para apresentação do OrçaRede ",
+      "duracao": 60,
+      "slots": [
+        {
+          "data": "2026-05-18",
+          "horarios": [
+            "09:00",
+            "11:00",
+            "12:00",
+            "14:00"
+          ]
+        }
+      ],
+      "ativo": true,
+      "criadoEm": "2026-05-18T06:43:48.085Z",
+      "agendamentos": [
+        {
+          "id": "XRykVqxb2m",
+          "nomeCliente": "teste",
+          "emailCliente": "contato@devpaulo.com.br",
+          "data": "2026-05-18",
+          "horario": "11:00",
+          "agendadoEm": "2026-05-18T06:44:25.037Z"
+        },
+        {
+          "id": "05GPKQ4deZ",
+          "nomeCliente": "CLEVERSON PAULO SIGNOR",
+          "emailCliente": "contato@devpaulo.com.br",
+          "data": "2026-05-18",
+          "horario": "14:00",
+          "agendadoEm": "2026-05-18T06:53:09.176Z"
+        },
+        {
+          "id": "yTx_M_g3uN",
+          "nomeCliente": "Descoberta",
+          "emailCliente": "contato@devpaulo.com.br",
+          "data": "2026-05-18",
+          "horario": "09:00",
+          "agendadoEm": "2026-05-18T06:55:24.880Z"
+        }
+      ]
+    }
+  ],
+  "bloqueios": [
+    {
+      "id": "mtyyvGHGJl",
+      "titulo": "sla",
+      "data": "2026-05-01",
+      "horarioInicio": "09:00",
+      "horarioFim": "10:00",
+      "criadoEm": "2026-05-18T06:27:20.003Z"
+    }
+  ]
+}
